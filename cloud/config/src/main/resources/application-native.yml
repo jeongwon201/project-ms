@@ -1,0 +1,11 @@
+server:
+  port: 8010
+spring:
+  config:
+    activate:
+      on-profile: native
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: file:C:\Users\jeong\Desktop\Project\project-ms-config-native

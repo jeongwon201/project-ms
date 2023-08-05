@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: eureka
+  profiles:
+    group:
+      local:
+        - local
+    active: local

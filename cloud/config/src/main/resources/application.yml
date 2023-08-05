@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: config
+  profiles:
+    group:
+      local:
+        - native
+    active: local

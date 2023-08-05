@@ -1,0 +1,5 @@
+rootProject.name = 'cloud'
+
+include 'config'
+include 'eureka'
+include 'gateway'

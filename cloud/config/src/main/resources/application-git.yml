@@ -1,0 +1,12 @@
+server:
+  port: 8010
+spring:
+  config:
+    activate:
+      on-profile: git
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/jeongwon201/project-ms-config.git
+          search-paths: '{application}'
