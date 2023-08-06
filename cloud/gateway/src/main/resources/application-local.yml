@@ -12,12 +12,40 @@ spring:
       on-profile: local
     import: "optional:configserver:http://localhost:8010"
   cloud:
+    circuitbreaker:
+      resilience4j:
+        enabled: true
     gateway:
+      httpclient:
+        connect-timeout: 2000
+        response-timeout: 2s
       routes:
-        - id: composite
-          uri: lb://composite
+        - id: auth
+          uri: lb://auth
           predicates:
-            - Path=/composite/**
+            - Path=/auth/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: cb
+                fallbackUri: forward:/fallback/auth
+
+resilience4j:
+  timelimiter:
+    configs:
+      default:
+        cancelRunningFuture: false
+        timeoutDuration: 5s
+  circuitbreaker:
+    configs:
+      default:
+        registerHealthIndicator: true # actuator를 통해 circuitbraker 상태를 확인하기 위해 설정
+        minimumNumberOfCalls: 10 # Circuit Breaker가 에러 비율 또 slow call 비율을 계산하기 전에 요구되는 최소한의 요청 수
+        failureRateThreshold: 50  # 에러 비율 (퍼센트)로 해당 값 이상으로 에러 발생시 서킷이 Open 된다.
+        waitDurationInOpenState: 10s  # 서킷의 상태가 Open에서 Half-open으로 변경되기 전에 Circuit Breaker가 기다리는 시간
+    instances:
+      cb:
+        baseConfig: default
 
 eureka:
   client:
@@ -33,3 +61,21 @@ logging:
   level:
     root: INFO
     com.spring.cloud.composite: DEBUG
+
+management:
+  server:
+    port: 8020
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    shutdown:
+      enabled: true
+    health:
+      show-details: always # actuator에서 디테일한 정보들을 확인하기 위해 설정
+    gateway:
+      enabled: true
+  health:
+    circuitbreakers:
+      enabled: true # actuator를 통해 circuitbraker 상태를 확인하기 위해 설정
